@@ -14,33 +14,28 @@ div {
 
 
 
+#optionsmain{border:2px solid; position:absolute;padding:3px}
 
-
-button{font-family:mono;border:1px solid black;background:#fff;cursor:pointer;margin:0px;line-height:1;}
+button{font-family:mono;border:1px solid black;background:#fff;cursor:pointer;margin:1px;padding:2px;line-height:1;}
 button:hover{background:#eee}
 select{font-family:mono;border:1px solid black;background:#eee;margin:0px;line-height:1;}
 select:hover{background:#fff}
 
 .editpixel{overflow:hidden;text-align:center}
 .editpixel:hover::before{content:"+";}
-
 .palettepixel{overflow:hidden;text-align:center}
 .palettepixel:hover::before{content:"+";}
 
-#debug{position:absolute;left:0px;bottom:0px;background:#fff;border:2px blue solid; color:#700; padding:10px;}
+#debug{position:fixed;left:0px;bottom:0px;background:#fff;border:2px #222 solid; color:#500; padding:5px;font-size:12px;font-family:normal;line-height:1}
 #debug::before{content:'DEBUG: '}
 </style>
 
-<body style="background:#ddd;color:#111;font-family:mono;line-height:1" onmousedown="mouseisdown=true;" onmouseup="mouseisdown=false;" id = "test">
+<body style="background:#ddd;color:#111;font-family:mono;" onmousedown="mouseisdown=true;" onmouseup="mouseisdown=false;" id = "test">
 <div id="debug"></div>
-      <canvas id = "mycanvas"></canvas>
-<br>
-<select id="pxsize">
-	<option value="4">4px</option>
-	<option value="2">2px</option>
-	<option value="1">1px</option>	
-	<option value="8">8px</option>	
-</select>
+      <canvas id = "mycanvas" ></canvas>
+<br><br><br><br>
+
+<div id='optionsMain'>
 	<select id='demosprite'>
 		<option value='pinkbox'>pink box</option>
 		<option value='angryduckman'>angry duckman</option>
@@ -49,16 +44,31 @@ select:hover{background:#fff}
 		<option value='test4'>sleepyGnome</option>
 		<option value='test5'>computer</option>
 	</select>
-	<button onclick="demosprite()">load</button><br>
-<input id='sprite' value=''></input>
+	<button onclick="demosprite()">load</button>
 <button onclick="makeeditor()">edit sprite</button><br>
-	<br><br><br><br>
-	extras:<br><br>
-	<button onclick="update_editor()">force update</button> (if editor sprite doesn't match)<br><button onclick="darkmode()">dark mode</button>
+<input id='sprite' value=''></input><br><br>
+display: 
+<select id="pxsize">
+	<option value="4">4px</option>
+	<option value="3">3px</option>
+	<option value="2">2px</option>
+	<option value="1">1px</option>	
+	<option value="8">8px</option>	
+</select>
+<select id="pxmode">
+	<option value="single">single</option>
+	<option value="tiled">tiled</option>
+</select>
 </div>
-<div id="editor" style='border:2px solid black;visibility:hidden;position:absolute;left:600;top:50;height:420px;width:440px;'>
-	<div id="preview" style="position:absolute;padding:5px; border: #fa0 solid 2px;width:180px"></div>
-	<div style="position:absolute;right:0px;border:5px #00f solid;padding:5px">
+	<br><br><br><br><br><br><br><br>
+	extras:<br><br>
+	<button onclick="darkmode()">dark mode</button>
+
+</div>
+
+<div id="editor" style='border:2px solid black;visibility:hidden;position:absolute;left:600;top:10;height:420px;width:420px;'>
+	<div id="preview" style="position:absolute;border: #aa0 solid 2px;width:180px"></div>
+	<div style="position:absolute;right:0px;border:1px #000 solid;padding:3px">
 	Palette: <span id='currentpalette' style='text-decoration:underline;'></span><br>
 	<select id='paletteoption'>
 		<option value='0'>pal_rp1</option>
@@ -68,13 +78,9 @@ select:hover{background:#fff}
 	</select> <br>
 	color: <div id="colorselect" style="display:inline-block;">
 	<br><br>	
-	
 	</div>
-	
-	<br><br>
-	
-	
-	</div></div>
+	</div>
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><button onclick="update_editor()">force update</button> (if sprite doesn't match)<br></div>
 </body></html>
 
 
@@ -151,23 +157,41 @@ function darkmode(){document.body.style.background = "#444"; document.body.style
 
 
 
+const canvas = document.getElementById('mycanvas'); 
+const ctx = canvas.getContext('2d');
+
+var row = 0;
+var column = 0;
+
+// function that doesn't work :(
+function drawSprite(c, object, xoffs, yoffs, sz, palette){
+	for(i=0;i<256;i++){
+		column = i%16;
+		if(column==0){row++}
+		c.fillStyle = palette[ object.split('')[i] ]; 
+		c.fillRect(column*sz+xoffs*sz, row*pxsz+yoffs*sz, sz, sz); 
+	} 
+	
+ row = 0;
+ column = 0;
+}
 
 // the actual drawing stuff is stupid simple, just a main()-type loop.
-setInterval( function drawShape() { 
-	const canvas = document.getElementById('mycanvas'); 
-	const ctx = canvas.getContext('2d'); 
-	if (canvas.getContext) { 
+setInterval( function drawScreen() {
+	if (canvas.getContext) {
 	ctx.clearRect(00, 00, 500, 500); 
-	object1 = document.getElementById("sprite").value;
-// pixel scale
-pxsz = document.getElementById('pxsize').value;
-
-var row=0;
-for(i=0;i<256;i++){
-	var column = i%16;
-	if(column==0){row++}
-	ctx.fillStyle = selected_palette[ object1.split('')[i] ];
-	ctx.fillRect(column*pxsz,row*pxsz,pxsz,pxsz); 
+	object1 = document.getElementById("sprite").value; //sprite string
+	pxsz = document.getElementById('pxsize').value;
+	mode = document.getElementById('pxmode');
+	
+	if(mode.value=='single'){ drawSprite(ctx, object1, 0, 0, pxsz, selected_palette); }
+	
+	else if(mode.value=='tiled'){
+		var trow=0;
+		for(t=0;t<16;t++){
+			if((t)%4==0){trow+=16}
+			drawSprite(ctx, object1, (t*16)%64, trow-16, pxsz, selected_palette);
+		}
 	}
 
 }else {alert('You need Safari or Firefox 1.5+ to see this demo.');}},50)
