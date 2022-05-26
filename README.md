@@ -3,10 +3,11 @@ unhappy with sprite editors out there and also wanted to make my own to get bett
 
 supports 10 colors, since sprites are just a long string of digits between 0 and 9.
 
+has 4 palettes by default, more can be added easily.
+
 
 ## future stuff to add
-- palette editor, more preset palettes to use
-- more demo sprites
+- palette editor, more preset/demo sprites and palettes
 - allow drawing lines instead of having to click one individual pixel at a time
-- make sprites be represented by a csv to allow for adding custom properties to the sprite
-- as a result of above, give sprites flags for various things like collision, size, animation, etc
+- allow for adding custom properties to the sprite, that can later be used in a game engine
+- flags for various things like collision, size, animation, etc
