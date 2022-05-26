@@ -1,0 +1,177 @@
+<style>
+.editpixel{overflow:hidden;}
+.editpixel:hover::before{content:"+";}
+
+.palettepixel{overflow:hidden;}
+.palettepixel:hover::before{content:"+";}
+
+#debug{position:absolute;left:0px;bottom:0px;background:#fff;border:2px blue solid; color:#700; padding:10px;}
+#debug::before{content:'DEBUG: '}
+</style>
+
+<body style="background:#ddd;color:#111" id = "test">
+<div id="debug"></div>
+      <canvas id = "mycanvas"></canvas>
+<br><br>
+<select id="pxsize">
+	<option value="4">4px</option>
+	<option value="2">2px</option>
+	<option value="1">1px</option>	
+	<option value="8">8px</option>	
+</select>
+	
+	
+	<br>
+sprite: <input id='sprite' value=''></input>
+	<br><br>
+	<button onclick="demosprite()">load demo sprite</button>
+	<br><br>
+
+<button onclick="makeeditor()">show editor</button><br><br>
+</div>
+<div id="editor" style='border:2px solid black;visibility:hidden;position:absolute;left:600;top:50;height:420px;width:500px;'>
+	<div id="preview" style="position:absolute;padding:5px; border: #fa0 solid 2px;width:260px"></div>
+	<div style="position:absolute;bottom:0px;border:2px #00f solid"><b>Current Palette:</b><br>
+	
+	<div id="colorselect" style="display:inline-block;"></div>
+	<br>
+	<button onclick="updatesprite()">force update</button>
+	
+	</div></div>
+	<button onclick="darkmode()">dark mode</button>
+</body></html>
+
+
+
+
+
+
+<script type = "text/javascript">
+
+function demosprite(){document.getElementById('sprite').value = '1111111111119811120000000000002110200000000002011002000000002001100020000002000110000200002000011000002002000001100000022000000110000002200000011000002002000001100002000020000110002000000200011002000000002001102000000000020112000000000000211111111111111111';}
+
+function darkmode(){document.body.style.background = "#444"; document.body.style.color="#bbb";}
+
+var debugmsg = document.getElementById('debug');
+
+setInterval(
+function drawShape() {
+const canvas = document.getElementById('mycanvas');
+const ctx = canvas.getContext('2d');
+if (canvas.getContext) { 
+	
+	
+ctx.clearRect(00, 00, 500, 500); 
+object1 = document.getElementById("sprite").value;
+
+
+// pixel scale
+pxsz = 4;
+// default palette
+pal_rp1 = ["#eee","#111","#f0f","#faf","#fc0","#00f","#08f","#090","#0000","#0000"];
+// demo object
+object2 = '1111111111111111120000000000002110200000000002011002000000002001100020000002000110000200002000011000002002000001100000022000000110000002200000011000002002000001100002000020000110002000000200011002000000002001102000000000020112000000000000211111111111111111';
+
+
+pxsz = document.getElementById('pxsize').value;
+
+var row=0;
+for(i=0;i<256;i++){
+	var column = i%16;
+	if(column==0){row++}
+	ctx.fillStyle = pal_rp1[ object1.split('')[i] ];
+	ctx.fillRect(column*pxsz,row*pxsz,pxsz,pxsz); 
+	}
+
+}else {alert('You need Safari or Firefox 1.5+ to see this demo.');}},20)
+
+
+
+
+
+
+
+
+
+var pal_rp1 = ["#eee","#111","#f0f","#faf","#fc0","#00f","#08f","#090","#0000","#0000","pal_rp1"];
+var selected_palette = pal_rp1;
+var selectedcolor = "#111";
+
+
+function checkindex(color){ return color == selectedcolor}
+
+function editpixel(){ 
+	this.style.background=selectedcolor; 
+	debugmsg.innerHTML = 'you set pixel:' + this.id + " to color:"+selectedcolor+'<br>attempt to insert value '+selected_palette.findIndex(checkindex,selectedcolor); 
+	spritearr = document.getElementById('sprite').value.split('');
+	spritearr[this.id] = selected_palette.findIndex(checkindex,selectedcolor);
+	
+	newspritearr = spritearr.join('');
+	document.getElementById('sprite').value = newspritearr;
+	}
+
+function selectcolor(){ selectedcolor = selected_palette[this.id]; debugmsg.innerHTML = 'you set color to:' + this.id + " from palette:" + selected_palette[10]; }
+
+
+
+
+
+
+
+
+
+
+
+function makeeditor(){
+	pxsz = 16;
+	var row=0;
+	var editorx = 0;
+	var editory = 0;
+
+// only generate divs if not visible
+if(document.getElementById('editor').style.visibility!='visible'){
+	document.getElementById('editor').style.visibility= 'visible';
+	// make preview out of divs
+	for(i=0;i<256;i++){
+		column = i%16;
+		if(column==0){row++}
+		let pixeldiv = document.createElement('div');
+		pixeldiv.style.background = pal_rp1[ object1.split('')[i] ];
+		pixeldiv.style.display = "inline-block";
+		pixeldiv.style.height = pxsz+"px";
+		pixeldiv.style.width = pxsz+"px"; 
+		pixeldiv.className = "editpixel";
+		pixeldiv.id = i;
+		pixeldiv.onclick = editpixel;
+		document.getElementById("preview").appendChild(pixeldiv);
+		}
+	// make palette tool
+	for(i=0;i<selected_palette.length;i++){
+		let palettediv = document.createElement('div');	
+		palettediv.style.background = selected_palette[i];
+		palettediv.style.display = "inline-block";
+		palettediv.style.height = pxsz+"px";
+		palettediv.style.width = pxsz+"px"; 
+		palettediv.className = "palettepixel"; 
+		palettediv.id = i;
+		palettediv.onclick = selectcolor;
+		document.getElementById('colorselect').appendChild(palettediv);
+	}}
+else{ //put a function here to update the editor's divs i guess
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+</script>
+
+
+
